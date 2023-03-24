@@ -105,6 +105,19 @@ const paragraphPerPhrase = (text) => {
 // Segunda opcion de sangria
 const sangria2 = (text, n) => text.replace(/^/gm, ' '.repeat(n))
 
+// Cada frase debe comenzar con n espacios en blanco
+const blankSpaces = (text, n) => {
+  newText = text.replace(/\. +/g, (match) => "." + " ".repeat(n))
+    .replace(/ +\n/g, '\n');
+  return newText;
+};
+
+// Cada párrafo debe estar separado por n líneas
+const paragraphSpacing = (text, n) => {
+  newText = text.replace(/\.\n+/g, (match) => "." + "\n".repeat(n+1))
+  return newText;
+}
+
 // Archivos de texto de prubea
 const userFile = archToStr('./texts/example.txt');
 const fitnessTestText = archToStr('./texts/fitnessTest.txt');
