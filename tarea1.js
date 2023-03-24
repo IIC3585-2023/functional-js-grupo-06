@@ -1,7 +1,6 @@
 const fs = require('fs');
-var user_file = './example.txt';
-const archToStr = (str) => fs.readFileSync(str).toString();
 
+const archToStr = (str) => fs.readFileSync(str).toString();
 const esParrafo = (str, char) => {if (char == '\n' && str[str.length - 1] == '.') {return true;}}
 
 // El ancho del texto debe ser a lo más n 
@@ -63,10 +62,63 @@ const maxFrases = (str, n) => {
     return newString
 }
 
-fInput = maxLength(sangria(maxLength(maxFrases(archToStr(user_file), 3), 20),5),20)
-console.log(fInput)
 
-// Para escribir archevos
-// fs.writeFile('tp.txt', fInput, (err) => {
-//     if (err) throw err;
-//  })
+// Helper: Contador de frases en parrafo
+const countPhrases = (paragraph) => {
+    numPhrases = paragraph
+        .split(/\. |\? |\! /g)
+        .length
+
+    return numPhrases
+}
+
+// Se ignoran los párrafos que tienen menos de ​n​ frases
+const ignoreParagraphLess = (text, n) => {
+    newText = text
+        .split(/\n+/g)
+        .filter(paragraph => countPhrases(paragraph) >= n)
+        .join("\n\n")
+
+    return newText
+}
+
+// Se ignoran los párrafos que tienen más de ​n​ frases
+const ignoreParagraphMore = (text, n) => {
+    newText = text
+        .split(/\n+/g)
+        .filter(paragraph => countPhrases(paragraph) <= n)
+        .join("\n\n")
+
+    return newText
+}
+
+// Cada frase debe aparecer en párrafo aparte
+// Nota: Se asume que una frase termina con un punto, interrogación o exclamación.
+const paragraphPerPhrase = (text) => {
+    newText = text
+        .replace(/\. |\? |\! /g, '.\n')
+        .replace(/\n+/g, '\n\n')
+
+    return newText
+}
+
+// Segunda opcion de sangria
+const sangria2 = (text, n) => text.replace(/^/gm, ' '.repeat(n))
+
+// Archivos de texto de prubea
+const userFile = archToStr('./texts/example.txt');
+const fitnessTestText = archToStr('./texts/fitnessTest.txt');
+const linuxText = archToStr('./texts/linux.txt');
+const loremText = archToStr('./texts/lorem.txt');
+
+// Pruebas de transformaciones
+// fInput = maxLength(sangria(maxLength(maxFrases(userFile, 3), 20),5),20)
+// fInput = paragraphPerPhrase(fitnessTestText)
+// fInput = ignoreParagraphLess(linuxText, 4)
+fInput = sangria2(paragraphPerPhrase(ignoreParagraphMore(loremText, 8)), 7)
+
+
+// Para escribir archivos
+fs.writeFile('output.txt', fInput, (err) => {
+    if (err) throw err;
+})
