@@ -1,6 +1,3 @@
-const fs = require('fs');
-
-const archToStr = (str) => fs.readFileSync(str).toString();
 const esParrafo = (str, char) => {if (char == '\n' && str[str.length - 1] == '.') {return true;}}
 
 // Helper: Contador de frases en parrafo
@@ -33,44 +30,44 @@ const blankSpaces = (text, n) => {
         .replace(/\. +/g, (match) => '.' + ' '.repeat(n))
         .replace(/ +\n/g, '\n');
 
-    return newText;
-};
+    return newText
+}
 
 // Cada párrafo debe estar separado por n líneas
 const paragraphSpacing = (text, n) => {
     const newText = text
         .replace(/\.\s+\n+/g, (match) => '.' + '\n'.repeat(n + 1))
 
-    return newText;
+    return newText
 }
 
 // El ancho del texto debe ser a lo más n 
-// const maxLength = (str, n) => {
-//     let newString = ''
-//     let word = ''
-//     let lineCount = 0
-//     for (let char of str) {
-//         if (char != '\n'){
-//             lineCount += 1;
-//         }
-//         if (char == ' ' || char == '.'){
-//             if (lineCount >= n){
-//                 newString += '\n';
-//                 lineCount = word.length + 1;
-//             }
-//             newString += word + char;
-//             word = '';
-//         }
-//         else if (char == '\n'){
-//             lineCount = 0;
-//             newString += char;
-//         }
-//         else {
-//             word += char;
-//         }
-//     };
-//     return newString
-// }
+const maxWidth = (text, n) => {
+    let newText = ''
+    let word = ''
+    let lineCount = 0
+    Array.from(text).forEach(char => {
+        if (char != '\n'){
+            lineCount += 1;
+        }
+        if (char == ' ' || char == '.') {
+            if (lineCount >= n){
+                newText += '\n';
+                lineCount = word.length + 1;
+            }
+            newText += word + char;
+            word = '';
+        }
+        else if (char == '\n') {
+            lineCount = 0;
+            newText += char;
+        }
+        else {
+            word += char;
+        }
+    });
+    return newText
+}
 
 // El ancho del texto debe ser a lo más ​n​ (sin cortar palabras)
 const limitWidth = (text, n) => {
@@ -98,16 +95,16 @@ const limitWidth = (text, n) => {
 }
 
 // Cada párrafo debe tener ​n​ espacios de sangría
-const sangria = (str, n) => {
-    let newString = ' '.repeat(n)
-    for ( let char of str) {
-        if (newString[newString.length-1]=='.' && char == '\n') {
-            newString += char + ' '.repeat(n);
-            continue
+const sangria = (text, n) => {
+    let newText = ' '.repeat(n)
+    Array.from(text).forEach(char => {
+        if (newText[newText.length-2]=='.' && newText[newText.length-1]=='\n' && char == '\n') {
+            newText += char + ' '.repeat(n);
+            return
         }
-        newString += char;
-    }
-    return newString;
+        newText += char;
+    })
+    return newText
 }
 
 // Segunda opcion de sangría 
@@ -146,6 +143,25 @@ const paragraphPerPhrase = (text) => {
 }
 
 // Solo las primeras ​n​ frases de cada párrafo
+const maxFrases = (text, n) => {
+    let newText = ''
+    let frasesCount = 0
+    Array.from(text).forEach(char => {
+        if (esParrafo(newText, char)) {
+            frasesCount = 0;
+        }
+        if (frasesCount >= n) {
+            return
+        }
+        if (".?!".includes(char)) {
+            frasesCount += 1;
+        }
+        newText += char;
+    })
+    return newText
+}
+
+// Solo las primeras ​n​ frases de cada párrafo
 const maxPhrases = (text, n) => {
     const paragraphDistance = text.match(/\n+/g)[0]
     const newText = text
@@ -159,56 +175,16 @@ const maxPhrases = (text, n) => {
     return newText
 }
 
-// Solo las primeras ​n​ frases de cada párrafo
-// const maxFrases = (str, n) => {
-//     let newString = ''
-//     let frasesCount = 0
-//     for (let char of str) {
-//         if (esParrafo(newString, char)){
-//             frasesCount = 0;
-//         }
-//         if (frasesCount >= n){
-//             continue
-//         }
-//         if (char == '.') {
-//             frasesCount += 1;
-//         }
-//         newString += char;
-//     }
-//     return newString
-// }
-
-// Archivos de texto de prubea
-const userFile = archToStr('./texts/example.txt');
-const fitnessTestText = archToStr('./texts/fitnessTest.txt');
-const linuxText = archToStr('./texts/linux.txt');
-const loremText = archToStr('./texts/lorem.txt');
-
-// Funciones disponibles
-// text => blankSpaces(text, n)
-// text => paragraphSpacing(text, n)
-// text => maxLength()
-// text => sangria()
-// text => ignoreParagraphLess(text, n)
-// text => ignoreParagraphMore(text, n)
-// text => paragraphPerPhrase(text)
-// text => maxPhrases(text, n)
-
-// Pipe visto en clases
-const pipe = (functions) => data => {
-    return functions.reduce((value, func) => func(value), data);
-};
-
-const pipeline = pipe([
-    text => paragraphSpacing(text, 5),
-    text => ignoreParagraphLess(text, 9),
-    text => maxPhrases(text, 2),
-    text => paragraphPerPhrase(text),
-]);
-
-const fInput = pipeline(loremText)
-
-// Para escribir archivos
-fs.writeFile('output.txt', fInput, (err) => {
-    if (err) throw err;
-})
+module.exports = {
+    blankSpaces,
+    paragraphSpacing,
+    limitWidth,
+    maxWidth,
+    identation,
+    sangria,
+    ignoreParagraphLess,
+    ignoreParagraphMore,
+    paragraphPerPhrase,
+    maxPhrases,
+    maxFrases,
+}
