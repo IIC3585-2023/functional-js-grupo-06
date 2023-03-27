@@ -67,6 +67,7 @@ const pipelineBeeMovieText = pipe([
     text => f.paragraphPerPhrase(text),
 ]);
 
+// Ejecución de pipelines - Descomentar opción para probar
 // const fInput = pipelineExampleText(exampleText);
 // const fInput = pipelineFitnessTestText(fitnessTestText);
 // const fInput = pipelineLinuxText(linuxText);
